@@ -26,6 +26,8 @@ namespace l1t {
             mode(-99),
             eta_GMT(-99),
             pt_GMT(-99),
+            pt_dxy_GMT(-99),
+            dxy_GMT(-99),
             me1_subsector(-99),
             me1_CSC_ID(-99),
             me1_stub_num(-99),
@@ -40,6 +42,7 @@ namespace l1t {
             me2_delay(-99),
             me3_delay(-99),
             me4_delay(-99),
+            nn_pt_valid(-99),
             pt_LUT_addr(-99),
             format_errors(0),
             dataword(-99){};
@@ -59,6 +62,8 @@ namespace l1t {
       void set_mode(int bits) { mode = bits; }
       void set_eta_GMT(int bits) { eta_GMT = bits; }
       void set_pt_GMT(int bits) { pt_GMT = bits; }
+      void set_pt_dxy_GMT(int bits) { pt_dxy_GMT = bits; }
+      void set_dxy_GMT(int bits) { dxy_GMT = bits; }
       void set_me1_subsector(int bits) { me1_subsector = bits; }
       void set_me1_CSC_ID(int bits) { me1_CSC_ID = bits; }
       void set_me1_stub_num(int bits) { me1_stub_num = bits; }
@@ -73,6 +78,7 @@ namespace l1t {
       void set_me2_delay(int bits) { me2_delay = bits; }
       void set_me3_delay(int bits) { me3_delay = bits; }
       void set_me4_delay(int bits) { me4_delay = bits; }
+      void set_nn_pt_valid(int bits) { nn_pt_valid = bits; }
       void set_pt_LUT_addr(unsigned long bits) { pt_LUT_addr = bits; }
       void add_format_error() { format_errors += 1; }
       void set_dataword(uint64_t bits) { dataword = bits; }
@@ -90,6 +96,8 @@ namespace l1t {
       int Mode() const { return mode; }
       int Eta_GMT() const { return eta_GMT; }
       int Pt_GMT() const { return pt_GMT; }
+      int Pt_dxy_GMT() const { return pt_dxy_GMT; }
+      int Dxy_GMT() const { return dxy_GMT; }
       int ME1_subsector() const { return me1_subsector; }
       int ME1_CSC_ID() const { return me1_CSC_ID; }
       int ME1_stub_num() const { return me1_stub_num; }
@@ -104,6 +112,7 @@ namespace l1t {
       int ME2_delay() const { return me2_delay; }
       int ME3_delay() const { return me3_delay; }
       int ME4_delay() const { return me4_delay; }
+      int NN_pt_valid() const { return nn_pt_valid; }
       unsigned long Pt_LUT_addr() const { return pt_LUT_addr; }
       int Format_errors() const { return format_errors; }
       uint64_t Dataword() const { return dataword; }
@@ -122,6 +131,8 @@ namespace l1t {
       int mode;
       int eta_GMT;
       int pt_GMT;
+      int pt_dxy_GMT;
+      int dxy_GMT;
       int me1_subsector;
       int me1_CSC_ID;
       int me1_stub_num;
@@ -136,6 +147,7 @@ namespace l1t {
       int me2_delay;
       int me3_delay;
       int me4_delay;
+      int nn_pt_valid;
       unsigned long pt_LUT_addr;
       int format_errors;
       uint64_t dataword;

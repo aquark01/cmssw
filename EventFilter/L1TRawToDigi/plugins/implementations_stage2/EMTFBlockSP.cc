@@ -191,6 +191,9 @@ namespace l1t {
         uint16_t SP2c = payload[6];
         uint16_t SP2d = payload[7];
 
+        std::cout << SP2c << std::endl;
+        std::cout << GetHexBits(SP2c,0,14) << std::endl;
+
         // res is a pointer to a collection of EMTFDaqOut class objects
         // There is one EMTFDaqOut for each MTF7 (60 deg. sector) in the event
         EMTFDaqOutCollection* res;
@@ -246,7 +249,12 @@ namespace l1t {
         SP_.set_me4_delay(GetHexBits(SP2b, 9, 11));
         SP_.set_tbin(GetHexBits(SP2b, 12, 14));
 
-        SP_.set_pt_LUT_addr(GetHexBits(SP2c, 0, 14, SP2d, 0, 14));
+        // SP_.set_pt_LUT_addr(GetHexBits(SP2c, 0, 14, SP2d, 0, 14));
+        SP_.set_pt_dxy_GMT(GetHexBits(SP2c, 0, 7));
+        SP_.set_dxy_GMT(GetHexBits(SP2c, 8, 10));
+        SP_.set_nn_pt_valid(GetHexBits(SP2c, 11, 11));
+
+        // std::cout << SP_.Pt_dxy_GMT() << " " << SP_.Dxy_GMT() << " " << SP_.NN_pt_valid() << std::endl;
 
         // SP_.set_dataword     ( uint64_t dataword );
 
@@ -271,6 +279,8 @@ namespace l1t {
         mu_.setHwEta(SP_.Eta_GMT());
         mu_.setHwPhi(SP_.Phi_GMT());
         mu_.setHwPt(SP_.Pt_GMT());
+        mu_.setHwPtUnconstrained(SP_.Pt_dxy_GMT());
+        mu_.setHwDXY(SP_.Dxy_GMT());
         mu_.setTFIdentifiers(Track_.Sector() - 1, (Track_.Endcap() == 1) ? emtf_pos : emtf_neg);
         mu_.setTrackSubAddress(RegionalMuonCand::kTrkNum, Track_.Track_num());
         // Truncated to 11 bits and offset by 25 from global event BX in EMTF firmware
