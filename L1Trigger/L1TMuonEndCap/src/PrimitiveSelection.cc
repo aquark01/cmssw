@@ -81,7 +81,8 @@ void PrimitiveSelection::process(emtf::CSCTag tag,
   // Duplicate CSC muon primitives
   // If there are 2 LCTs in the same chamber with (strip, wire) = (s1, w1) and (s2, w2)
   // make all combinations with (s1, w1), (s2, w1), (s1, w2), (s2, w2)
-  if (duplicateTheta_) {
+  if (false) {
+  // if (duplicateTheta_) {
     std::map<int, TriggerPrimitiveCollection>::iterator map_tp_it = selected_csc_map.begin();
     std::map<int, TriggerPrimitiveCollection>::iterator map_tp_end = selected_csc_map.end();
 
@@ -599,6 +600,8 @@ int PrimitiveSelection::select_csc(const TriggerPrimitive& muon_primitive) const
     int tp_bx = tp_data.bx;
     int tp_csc_ID = tp_data.cscID;
 
+    // std::cout << " tp data quart eighth: " << tp_data.strip_quart_bit << " " << tp_data.strip_eighth_bit << std::endl;
+
     const auto& [max_strip, max_wire] = emtf::get_csc_max_strip_and_wire(tp_station, tp_ring);
     const auto& [max_pattern, max_quality] = emtf::get_csc_max_pattern_and_quality(tp_station, tp_ring);
 
@@ -613,6 +616,7 @@ int PrimitiveSelection::select_csc(const TriggerPrimitive& muon_primitive) const
       emtf_assert(tp_data.pattern < max_pattern);
       emtf_assert(0 < tp_data.quality && tp_data.quality < max_quality);
     }
+    // std::cout << bx_ << " " << tp_endcap << " " << tp_sector << " " << tp_station << " " << tp_chamber << " " << tp_data.strip << " " << tp_data.keywire << std::endl; 
 
     // Check for corrupted LCT data. Data corruption could occur due to software or hardware issues, If corrupted, reject the LCT.
     // Note that the checks are performed in every sector processor for every BX. As a result, the same LCT may be reported multiple times by all 12 sector processors from BX=-3 to BX=+3.

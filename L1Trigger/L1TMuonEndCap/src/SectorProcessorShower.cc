@@ -105,7 +105,7 @@ int SectorProcessorShower::get_index_shower(
     }
   }
 
-  emtf_assert(selected != -1);
+  // emtf_assert(selected != -1);
   return selected;
 }
 

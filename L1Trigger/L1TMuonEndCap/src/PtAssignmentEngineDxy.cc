@@ -235,6 +235,12 @@ void PtAssignmentEngineDxy::preprocessing_dxy(const EMTFTrack& track, emtf::Feat
               x_dtheta[0],    x_dtheta[1],    x_dtheta[2],    x_dtheta[3],    x_dtheta[4],  x_dtheta[5],
               x_bend_emtf[0], x_bend_emtf[1], x_bend_emtf[2], x_bend_emtf[3], x_fr_emtf[0], x_trk_theta[0],
               x_me11ring[0],  x_rpcbit[0],    x_rpcbit[1],    x_rpcbit[2],    x_rpcbit[3]}};
+
+  // std::cout << "NN input: " << x_dphi[0] << " " << x_dphi[1] << " " << x_dphi[2] << " " << x_dphi[3] << " " << x_dphi[4] << " " << x_dphi[5] << " " <<
+  //           x_dtheta[0] << " " << x_dtheta[1] << " " << x_dtheta[2] << " " << x_dtheta[3] << " " << x_dtheta[4] << " " << x_dtheta[5] << " " <<
+  //           x_bend_emtf[0] << " " << x_bend_emtf[1] << " " << x_bend_emtf[2] << " " << x_bend_emtf[3] << " " << x_fr_emtf[0] << " " << x_trk_theta[0] << " " <<
+  //           x_me11ring[0] << " " << x_rpcbit[0] << " " << x_rpcbit[1] << " " << x_rpcbit[2] << " " << x_rpcbit[3] << std::endl;
+
   return;
 }
 
@@ -242,6 +248,8 @@ void PtAssignmentEngineDxy::call_tensorflow_dxy(const emtf::Feature& feature, em
   tensorflow::Tensor input(tensorflow::DT_FLOAT, {1, emtf::NUM_FEATURES});
   std::vector<tensorflow::Tensor> outputs;
   emtf_assert(feature.size() == emtf::NUM_FEATURES);
+
+  // std::cout << "NN input: " << feature << std::endl;
 
   float* d = input.flat<float>().data();
   std::copy(feature.begin(), feature.end(), d);
@@ -258,5 +266,7 @@ void PtAssignmentEngineDxy::call_tensorflow_dxy(const emtf::Feature& feature, em
   // Remove scale factor used during training
   prediction.at(0) /= reg_pt_scale;
   prediction.at(1) /= reg_dxy_scale;
+
+  // std::cout << "After LUT: " << abs(1.0/prediction.at(0)) << " " << prediction.at(1) << std::endl;
   return;
 }

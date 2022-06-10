@@ -168,6 +168,9 @@ namespace emtf {
 
   std::pair<int, int> get_csc_max_pattern_and_quality(int station, int ring) {
     int max_pattern = 11;
+    if (ring == 1 || ring == 4){
+      max_pattern = 30;
+    }
     int max_quality = 16;
     return std::make_pair(max_pattern, max_quality);
   }

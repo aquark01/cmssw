@@ -180,7 +180,9 @@ namespace l1t {
         bool useNNBits_ = getAlgoVersion() >= 11098;   // FW versions >= 26.10.2021
         bool useHMTBits_ = getAlgoVersion() >= 11306;  // FW versions >= 10.01.2022
 
-        static constexpr int nominalShower_ = 2;
+        // std::cout << "fw version: " << getAlgoVersion() << std::endl;
+
+        static constexpr int nominalShower_ = 1;
         static constexpr int tightShower_ = 3;
 
         // Check Format of Payload
@@ -312,7 +314,11 @@ namespace l1t {
           muShower_.setTFIdentifiers(Track_.Sector() - 1, (Track_.Endcap() == 1) ? emtf_pos : emtf_neg);
           muShower_.setOneNominalInTime(SP_.HMT() == nominalShower_ ? true : false);
           muShower_.setOneTightInTime(SP_.HMT() == tightShower_ ? true : false);
+          // std::cout << "HMT bits: " << SP_.HMT() << std::endl;
         }
+
+        // if (SP_.HMT() > 0)
+          // std::cout << "HMT bits: " << SP_.HMT() << std::endl;
 
         ///////////////////////
         // Match hits to tracks
@@ -580,6 +586,23 @@ namespace l1t {
         (res->at(iOut)).push_SP(SP_);
 
         res_track->push_back(Track_);
+
+        // if (Track_.Sector_idx() == 7){
+
+          // std::cout << "-------------------------------" << std::endl;
+          // std::cout << "Track UNP:" << std::endl;
+
+          // std::cout << "mode: " << Track_.Mode() << " phi_deltas: " << Track_.PtLUT().delta_ph[0] << " " << Track_.PtLUT().delta_ph[1] << " " << Track_.PtLUT().delta_ph[2] << " " << Track_.PtLUT().delta_ph[3]
+          // << " " << Track_.PtLUT().delta_ph[4] << " " << Track_.PtLUT().delta_ph[5] << " theta_deltas: " << Track_.PtLUT().delta_th[0] << " " << Track_.PtLUT().delta_th[1] << " " << Track_.PtLUT().delta_th[2]
+          // << " " << Track_.PtLUT().delta_th[3] << " " << Track_.PtLUT().delta_th[4] << " " << Track_.PtLUT().delta_th[5] << " track_phi: " << Track_.Phi_fp() << " track_theta: " << Track_.Theta_fp()
+          // << " address: " << Track_.PtLUT().address << std::endl;
+
+
+          // std::cout << Track_.BX() << " " << (Track_.Endcap() == 1 ? 1 : 2) << " " << Track_.Sector() << " " << Track_.PtLUT().address
+          //           << " " << Track_.Mode() << " " << (Track_.GMT_eta() >= 0 ? Track_.GMT_eta() : Track_.GMT_eta() + 512) << " "
+          //           << Track_.GMT_phi() << " " << Track_.GMT_charge() << " " << Track_.GMT_quality() << " " << Track_.Pt() << " " << Track_.Pt_dxy() << std::endl;
+          // std::cout << "-------------------------------" << std::endl;
+        // }
 
         // TBIN_num can range from 0 through 7, i.e. BX = -3 through +4. - AWB 04.04.16
         res_cand->setBXRange(-3, 4);

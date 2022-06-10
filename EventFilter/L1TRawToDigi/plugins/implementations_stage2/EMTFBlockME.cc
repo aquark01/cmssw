@@ -180,29 +180,48 @@ namespace l1t {
         ////////////////////////////
         // Unpack the ME Data Record
         ////////////////////////////
+        // std::cout << "-------------------------------" << std::endl;
+        // std::cout << "FRM: " << GetHexBits(MEc, 12, 12) << std::endl;
 
-        ME_.set_clct_pattern(GetHexBits(MEa, 0, 3));
-        ME_.set_quality(GetHexBits(MEa, 4, 7));
+        // if (GetHexBits(MEc, 12, 12) == 1){
+        //   // std::cout << "-------------------------------" << std::endl;
+        //   std::cout << "HMV: " << GetHexBits(MEd, 7, 7) << std::endl;
+        //   std::cout << "HMT 3-1: " << GetHexBits(MEa, 1, 3) << std::endl;
+        //   std::cout << "HMT 4: " << GetHexBits(MEb, 13, 13) << std::endl;
+        //   std::cout << "QS: " << GetHexBits(MEa, 7, 7) << std::endl;
+        //   std::cout << "ES: " << GetHexBits(MEd, 13, 13) << std::endl;
+        //   std::cout << "bend: " << GetHexBits(MEd, 8, 11) << std::endl;
+        // } else {
+        //   std::cout << "QS: " << GetHexBits(MEa, 7, 7) << std::endl;
+        //   std::cout << "ES: " << GetHexBits(MEd, 13, 13) << std::endl;
+        //   std::cout << "bend: " << GetHexBits(MEd, 8, 11) << std::endl;
+        // }
+
+
+        // Common fields between TMB and OTMB
+
+        // ME_.set_clct_pattern(GetHexBits(MEa, 0, 3));
+        // ME_.set_quality(GetHexBits(MEa, 4, 7));
         ME_.set_wire(GetHexBits(MEa, 8, 14));
 
         ME_.set_strip(GetHexBits(MEb, 0, 7));
         ME_.set_csc_ID(GetHexBits(MEb, 8, 11));
         ME_.set_lr(GetHexBits(MEb, 12, 12));
-        ME_.set_bxe(GetHexBits(MEb, 13, 13));
+        // ME_.set_bxe(GetHexBits(MEb, 13, 13));
         ME_.set_bc0(GetHexBits(MEb, 14, 14));
 
         ME_.set_me_bxn(GetHexBits(MEc, 0, 11));
-        ME_.set_nit(GetHexBits(MEc, 12, 12));
+        // ME_.set_nit(GetHexBits(MEc, 12, 12));
         ME_.set_cik(GetHexBits(MEc, 13, 13));
         ME_.set_afff(GetHexBits(MEc, 14, 14));
 
         ME_.set_tbin(GetHexBits(MEd, 0, 2));
         ME_.set_vp(GetHexBits(MEd, 3, 3));
         ME_.set_station(GetHexBits(MEd, 4, 6));
-        ME_.set_af(GetHexBits(MEd, 7, 7));
-        ME_.set_epc(GetHexBits(MEd, 8, 11));
+        // ME_.set_af(GetHexBits(MEd, 7, 7));
+        // ME_.set_epc(GetHexBits(MEd, 8, 11));
         ME_.set_sm(GetHexBits(MEd, 12, 12));
-        ME_.set_se(GetHexBits(MEd, 13, 13));
+        // ME_.set_se(GetHexBits(MEd, 13, 13));
         ME_.set_afef(GetHexBits(MEd, 14, 14));
 
         // ME_.set_dataword     ( uint64_t dataword);
@@ -230,6 +249,47 @@ namespace l1t {
           edm::LogWarning("L1T|EMTF") << "EMTF unpacked LCT sector = " << Hit_.Sector()
                                       << ", outside proper [1, 6] range" << std::endl;
 
+        Hit_.set_ring(L1TMuonEndCap::calc_ring(Hit_.Station(), Hit_.CSC_ID(), ME_.Strip()));
+
+        // std::cout << "Hit ring: " << Hit_.Ring() << std::endl;
+
+        if(Hit_.Ring() == 1 || Hit_.Ring() == 4){
+          int frm = GetHexBits(MEc, 12, 12);
+          if (frm == 0){
+            ME_.set_clct_pattern(GetHexBits(MEa, 0, 3));
+
+            ME_.set_bxe(GetHexBits(MEb, 13, 13));
+
+            ME_.set_af(GetHexBits(MEd, 7, 7));
+          } else{
+            ME_.set_clct_pattern(GetHexBits(MEa, 0, 0));
+            ME_.set_hmt(2*GetHexBits(MEa, 1, 3) + GetHexBits(MEb, 13, 13)); // HMT[3:1] is in MEa, but HMT[0] is in MEb
+
+            ME_.set_hmv(GetHexBits(MEd, 7, 7));
+          }
+
+          ME_.set_quality(GetHexBits(MEa, 4, 6));
+          ME_.set_quarter_strip(GetHexBits(MEa,7,7));
+
+          ME_.set_frame(GetHexBits(MEc, 12, 12));
+
+          ME_.set_slope(GetHexBits(MEd, 8, 11));
+          ME_.set_eighth_strip(GetHexBits(MEd, 13, 13));
+
+        } else{
+          ME_.set_clct_pattern(GetHexBits(MEa, 0, 3));
+          ME_.set_quality(GetHexBits(MEa, 4, 7));
+
+          ME_.set_bxe(GetHexBits(MEb, 13, 13));
+
+          ME_.set_nit(GetHexBits(MEc, 12, 12));
+
+          ME_.set_af(GetHexBits(MEd, 7, 7));
+          ME_.set_epc(GetHexBits(MEd, 8, 11));
+          ME_.set_se(GetHexBits(MEd, 13, 13));
+
+        }
+
         // Fill the EMTFHit
         ImportME(Hit_, ME_, (res->at(iOut)).PtrEventHeader()->Endcap(), (res->at(iOut)).PtrEventHeader()->Sector());
 
@@ -255,17 +315,53 @@ namespace l1t {
           }
         }  // End loop: for (auto const & iHit : *res_hit)
 
-        if (exact_duplicate)
-          edm::LogWarning("L1T|EMTF") << "EMTF unpacked duplicate LCTs: BX " << Hit_.BX() << ", endcap "
-                                      << Hit_.Endcap() << ", station " << Hit_.Station() << ", sector " << Hit_.Sector()
-                                      << ", neighbor " << Hit_.Neighbor() << ", ring " << Hit_.Ring() << ", chamber "
-                                      << Hit_.Chamber() << ", strip " << Hit_.Strip() << ", wire " << Hit_.Wire()
-                                      << std::endl;
+        // std::cout << "------------------------------" << std::endl;
+        // std::cout << "EMTF CSC is valid: " << ME_.VP() << std::endl;
+        // std::cout << "EMTF CSC strip: " << ME_.Strip() << std::endl;
+        // std::cout << "EMTF CSC ID: " << ME_.CSC_ID() << std::endl;
+        // std::cout << "EMTF CSC BC0: " << ME_.BC0() << std::endl;
+        // std::cout << "EMTF CSC BXE: " << ME_.BXE() << std::endl;
+        // std::cout << "EMTF CSC ME_BXN: " << ME_.ME_BXN() << std::endl;
+        // std::cout << "EMTF CSC TBIN: " << ME_.TBIN() << std::endl;
+
+        // std::cout << "------------------------------" << std::endl;
+        // std::cout << "EMTF CSC is valid: " << Hit_.Valid() << std::endl;
+        // std::cout << "EMTF CSC strip: " << Hit_.Strip() << std::endl;
+        // std::cout << "EMTF CSC wire: " << Hit_.Wire() << std::endl;
+        // std::cout << "EMTF CSC TBIN: " << ME_.TBIN() << std::endl;
+        // if (Hit_.Subsystem() == L1TMuon::kCSC) {
+        // // if (Hit_.Sector_idx() == 7){
+
+//           int bx = 0;
+//           int endcap = (Hit_.Endcap() == 1) ? 1 : 2;
+//           int sector = Hit_.PC_sector();
+//           int station = (Hit_.PC_station() == 0 && Hit_.Subsector() == 1) ? 1 : Hit_.PC_station();
+//           int chamber = Hit_.PC_chamber() + 1;
+//           int strip = (Hit_.Station() == 1 && Hit_.Ring() == 4) ? Hit_.Strip() + 128 : Hit_.Strip();  // ME1/1a
+//           int wire = Hit_.Wire();
+//           int valid = 1;
+//           std::cout << "-------------------------------" << std::endl;
+//           std::cout << "CSC Unpacked" << std::endl;
+//           std::cout << bx << " " << endcap << " " << sector << " " << Hit_.Subsector() << " " << station << " "
+//                     << valid << " " << Hit_.Quality() << " " << Hit_.Pattern() << " " << wire << " " << chamber << " "
+//                     << Hit_.Slope() << " " << strip << " " << 2*Hit_.Strip_quart_bit() + Hit_.Strip_eighth_bit() << std::endl;
+//           std::cout << "hit phi: " << Hit_.Phi_fp() << " theta: " << Hit_.Theta_fp() << " zone hit: " << Hit_.Zone_hit() << " zone code: " << Hit_.Zone_code()
+//           << " phi loc:" << Hit_.Phi_loc() << " phi glob: " << Hit_.Phi_glob() << " theta: " << Hit_.Theta() << std::endl;
+//         // }
+
+
+// //
+//         if (exact_duplicate)
+//           edm::LogWarning("L1T|EMTF") << "EMTF unpacked duplicate LCTs: BX " << Hit_.BX() << ", endcap "
+//                                       << Hit_.Endcap() << ", station " << Hit_.Station() << ", sector " << Hit_.Sector()
+//                                       << ", neighbor " << Hit_.Neighbor() << ", ring " << Hit_.Ring() << ", chamber "
+//                                       << Hit_.Chamber() << ", strip " << Hit_.Strip() << ", wire " << Hit_.Wire()
+//                                       << std::endl;
 
         (res->at(iOut)).push_ME(ME_);
-        if (!exact_duplicate)
+        if (!exact_duplicate && Hit_.Valid() == 1)
           res_hit->push_back(Hit_);
-        if (!exact_duplicate && !neighbor_duplicate)  // Don't write duplicate LCTs from adjacent sectors
+        if (!exact_duplicate && !neighbor_duplicate && Hit_.Valid() == 1)  // Don't write duplicate LCTs from adjacent sectors
           res_LCT->insertDigi(Hit_.CSC_DetId(), Hit_.CreateCSCCorrelatedLCTDigi());
 
         // Finished with unpacking one ME Data Record

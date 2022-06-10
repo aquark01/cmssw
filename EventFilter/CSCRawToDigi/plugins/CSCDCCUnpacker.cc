@@ -532,8 +532,12 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
 
               /// fill Run3 anode HMT Shower digis
               /// anode shower digis vector per ALCT BX from ALCT data
+              // std::cout << "------------------------------" << std::endl;
+
               if (useCSCShowers_) {
                 std::vector<CSCShowerDigi> anodeShowerDigisALCT = cscData[iCSC].alctHeader()->alctShowerDigis();
+                // for(int unsigned i = 0; i < anodeShowerDigisALCT.size(); ++i)
+                  // std::cout<< "ALCT HMT: " << anodeShowerDigisALCT[i].isNominalInTime() << " " << anodeShowerDigisALCT[i].isTightInTime() << std::endl;
                 anodeShowerProductALCT->move(std::make_pair(anodeShowerDigisALCT.begin(), anodeShowerDigisALCT.end()),
                                              layer);
               }
@@ -559,6 +563,42 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
             if (goodTMB) {
               std::vector<CSCCorrelatedLCTDigi> correlatedlctDigis =
                   cscData[iCSC].tmbHeader()->CorrelatedLCTDigis(layer.rawId());
+
+
+              // for (int unsigned i = 0; i < correlatedlctDigis.size(); ++i) {
+              //   if (correlatedlctDigis[i].isValid()){
+              //     std::cout << "------------------------------" << std::endl;
+              //     std::cout << "CSC is valid: " << correlatedlctDigis[i].isValid() << std::endl;
+              //     std::cout << "CSC quality: " << correlatedlctDigis[i].getQuality() << std::endl;
+              //     std::cout << "CSC strip: " << correlatedlctDigis[i].getStrip() << std::endl;
+              //     std::cout << "CSC key WG: " << correlatedlctDigis[i].getKeyWG() << std::endl;
+              //     std::cout << "CSC LCT QS: " << correlatedlctDigis[i].getQuartStripBit() << std::endl;
+              //     std::cout << "CSC LCT ES: " << correlatedlctDigis[i].getEighthStripBit() << std::endl;
+              //   }
+              // }
+              // if (goodALCT) {
+              //   std::vector<CSCALCTDigi> alctDigis = cscData[iCSC].alctHeader()->ALCTDigis();
+              //   std::vector<CSCShowerDigi> anodeShowerDigisALCT = cscData[iCSC].alctHeader()->alctShowerDigis();
+              //   // std::cout << "size comp: " << alctDigis.size() << " " << anodeShowerDigisALCT.size() << std::endl;
+              //   for(int unsigned i = 0; i < anodeShowerDigisALCT.size(); ++i){
+              //     if (anodeShowerDigisALCT[i].isValid()) {
+              //       std::cout<< "ALCT HMT: " << anodeShowerDigisALCT[i].isNominalInTime() << " " << anodeShowerDigisALCT[i].isTightInTime() << std::endl;
+              //     }
+              //   }
+
+              //   for (int unsigned i = 0; i < alctDigis.size(); ++i) {
+              //     if (alctDigis[i].isValid()) {
+              //       // std::cout << "------------------------------" << std::endl;
+              //       std::cout << "ALCT is valid: " << alctDigis[i].isValid() << std::endl;
+              //       std::cout << "ALCT key WG: " << alctDigis[i].getKeyWG() << std::endl;
+              //       std::cout << "ALCT BX: " << alctDigis[i].getBX() << std::endl;
+              //       // std::cout << "ALCT full BX: " << alctDigis[i].getFullBX() << std::endl;
+              //       // std::cout << "ALCT quality: " << alctDigis[i].getQuality() << std::endl;
+              //     }
+              //   }
+              // }
+
+                  
               if (SuppressZeroLCT) {
                 std::vector<CSCCorrelatedLCTDigi> correlatedlctDigis_0;
                 for (int unsigned i = 0; i < correlatedlctDigis.size(); ++i) {
@@ -585,6 +625,7 @@ void CSCDCCUnpacker::produce(edm::Event& e, const edm::EventSetup& c) {
                 /// (O)TMB Shower digi sent to MPC LCT trigger data
                 CSCShowerDigi lctShowerDigi = cscData[iCSC].tmbHeader()->showerDigi(layer.rawId());
                 if (lctShowerDigi.isValid()) {
+                  // std::cout<< "CLCT HMT: " << lctShowerDigi.isNominalInTime() << " " << lctShowerDigi.isTightInTime() << std::endl;
                   std::vector<CSCShowerDigi> lctShowerDigis;
                   lctShowerDigis.push_back(lctShowerDigi);
                   lctShowerProduct->move(std::make_pair(lctShowerDigis.begin(), lctShowerDigis.end()), layer);
