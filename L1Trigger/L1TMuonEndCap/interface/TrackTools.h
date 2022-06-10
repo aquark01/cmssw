@@ -27,6 +27,9 @@ namespace emtf {
 
   std::pair<int, int> get_csc_max_pattern_and_quality(int station, int ring);
 
+  // Run 3 CCLUT
+  std::pair<int, int> get_csc_max_pattern_and_quality_cclut(int station, int ring);
+
   // ___________________________________________________________________________
   // coordinate ranges: phi[-180, 180] or [-pi, pi], theta[0, 90] or [0, pi/2]
   inline double wrap_phi_deg(double deg) {

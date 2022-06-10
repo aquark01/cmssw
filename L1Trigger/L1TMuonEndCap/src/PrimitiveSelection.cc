@@ -25,7 +25,9 @@ void PrimitiveSelection::configure(int verbose,
                                    int bxShiftME0,
                                    bool includeNeighbor,
                                    bool duplicateTheta,
-                                   bool bugME11Dupes) {
+                                   bool bugME11Dupes,
+                                   bool useRun3CCLUT_OTMB,
+                                   bool useRun3CCLUT_TMB) {
   verbose_ = verbose;
   endcap_ = endcap;
   sector_ = sector;
@@ -39,6 +41,10 @@ void PrimitiveSelection::configure(int verbose,
   includeNeighbor_ = includeNeighbor;
   duplicateTheta_ = duplicateTheta;
   bugME11Dupes_ = bugME11Dupes;
+
+  // Run 3 CCLUT algorithm
+  useRun3CCLUT_OTMB_ = useRun3CCLUT_OTMB;
+  useRun3CCLUT_TMB_ = useRun3CCLUT_TMB;
 }
 
 // _____________________________________________________________________________
@@ -599,8 +605,11 @@ int PrimitiveSelection::select_csc(const TriggerPrimitive& muon_primitive) const
     int tp_bx = tp_data.bx;
     int tp_csc_ID = tp_data.cscID;
 
+    const bool useRun3CCLUT((useRun3CCLUT_OTMB_ and (tp_ring == 1 or tp_ring == 4)) or (useRun3CCLUT_TMB_ and (tp_ring == 2 or tp_ring == 3)));
+
     const auto& [max_strip, max_wire] = emtf::get_csc_max_strip_and_wire(tp_station, tp_ring);
     const auto& [max_pattern, max_quality] = emtf::get_csc_max_pattern_and_quality(tp_station, tp_ring);
+    const auto& [max_pattern_cclut, max_quality_cclut] = emtf::get_csc_max_pattern_and_quality_cclut(tp_station, tp_ring);
 
     if (endcap_ == 1 && sector_ == 1 && bx_ == -3) {  // do assertion checks only once
       emtf_assert(emtf::MIN_ENDCAP <= tp_endcap && tp_endcap <= emtf::MAX_ENDCAP);
@@ -656,9 +665,29 @@ int PrimitiveSelection::select_csc(const TriggerPrimitive& muon_primitive) const
         return selected;
       }
 
+      if (!(tp_data.pattern_run3 < max_pattern_cclut) and useRun3CCLUT) {
+        edm::LogWarning("L1T") << "Found error in LCT Run 3 pattern: " << tp_data.pattern_run3 << " (allowed range: 0-"
+                               << max_pattern_cclut - 1 << ").";
+        edm::LogWarning("L1T")
+            << "From endcap " << tp_endcap << ", sector " << tp_sector << ", station " << tp_station << ", ring "
+            << tp_ring << ", cscid " << tp_csc_ID
+            << ". (Note that this LCT may be reported multiple times. See source code for explanations.)";
+        return selected;
+      }
+
       if (!(0 < tp_data.quality && tp_data.quality < max_quality)) {
         edm::LogWarning("L1T") << "Found error in LCT quality: " << tp_data.quality << " (allowed range: 1-"
                                << max_quality - 1 << ").";
+        edm::LogWarning("L1T")
+            << "From endcap " << tp_endcap << ", sector " << tp_sector << ", station " << tp_station << ", ring "
+            << tp_ring << ", cscid " << tp_csc_ID
+            << ". (Note that this LCT may be reported multiple times. See source code for explanations.)";
+        return selected;
+      }
+
+      if (!(0 < tp_data.quality && tp_data.quality < max_quality_cclut) and useRun3CCLUT) {
+        edm::LogWarning("L1T") << "Found error in Run 3 LCT quality: " << tp_data.quality << " (allowed range: 1-"
+                               << max_quality_cclut - 1 << ").";
         edm::LogWarning("L1T")
             << "From endcap " << tp_endcap << ", sector " << tp_sector << ", station " << tp_station << ", ring "
             << tp_ring << ", cscid " << tp_csc_ID

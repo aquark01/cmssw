@@ -172,4 +172,10 @@ namespace emtf {
     return std::make_pair(max_pattern, max_quality);
   }
 
+  std::pair<int, int> get_csc_max_pattern_and_quality_cclut(int station, int ring) {
+    int max_pattern = 5;
+    int max_quality = 8;
+    return std::make_pair(max_pattern, max_quality);
+  }
+
 }  // namespace emtf
